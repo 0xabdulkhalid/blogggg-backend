@@ -1,0 +1,16 @@
+{
+  "name": "blog-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "0xabdulkhalid",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
