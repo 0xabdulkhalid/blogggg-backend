@@ -6,6 +6,7 @@ const createError = require("http-errors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const userRouter = require("./routes/user");
+const postRouter = require("./routes/post");
 const app = express();
 
 const mongoDB = process.env.MONGO_URI;
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/user", userRouter);
+app.use("/blog", postRouter);
 
 app.get("/test", (req, res, next) => {
   if (!req.isAuthenticated()) return res.status(403).send("Unauthenticated");
