@@ -15,7 +15,9 @@ exports.create_comment = asyncHandler(async (req, res) => {
   });
 
   await comment.save();
-  res.status(201).json({ success: true });
+  res
+    .status(201)
+    .json({ success: true, message: "Comment created successfully" });
 });
 
 exports.get_comments = asyncHandler(async (req, res) => {
@@ -30,7 +32,6 @@ exports.get_comments = asyncHandler(async (req, res) => {
             author: 1,
             content: 1,
             createdAt: 1,
-            postId: 0,
             isEditable: {
               $eq: ["$author", req.user.username], // Check if the author matches the current user
             },
@@ -39,4 +40,30 @@ exports.get_comments = asyncHandler(async (req, res) => {
       ]);
 
   res.status(200).json({ success: true, data: comments });
+});
+
+exports.delete_comment = asyncHandler(async (req, res) => {
+  const comment = await Comment.findById(req.params.commentId);
+
+  // Check if comment really exists before proceeding.
+  if (!comment) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Comment not found" });
+  }
+
+  // Check if the current user is authorized to delete the comment
+  if (comment.author !== req.user.username) {
+    return res.status(403).json({
+      success: false,
+      message: "You are not authorized to delete this comment",
+    });
+  }
+
+  // Delete the comment
+  await Comment.findByIdAndDelete(req.params.commentId);
+
+  res
+    .status(200)
+    .json({ success: true, message: "Comment deleted successfully" });
 });
