@@ -1,8 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/user");
 const passport = require("passport");
+const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
-require("dotenv").config;
 
 exports.create_user = [
   body("username", "User Name is required.")
@@ -20,9 +20,10 @@ exports.create_user = [
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = new User({
       username: req.body.username,
-      password: req.body.password,
+      password: hashedPassword,
     });
 
     if (!errors.isEmpty()) {
@@ -35,7 +36,7 @@ exports.create_user = [
         if (err) {
           return next(err);
         }
-        delete user.password;
+        user.password = "";
         return res.status(200).json(user);
       });
     }
@@ -45,22 +46,20 @@ exports.create_user = [
 exports.login_user = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
-      return next(err);
+      return res.status(500).json({ error: err.message });
     }
 
     if (!user) {
       return res.status(406).json({
-        errors: info.message,
-        username: req.body.username,
-        password: req.body.password,
+        message: info.message,
       });
     }
 
     req.login(user, function (err) {
       if (err) {
-        return next(err);
+        return res.status(500).json({ error: err.message });
       }
-      delete user.password;
+      user.password = "";
       return res.status(200).json(user);
     });
   })(req, res, next);

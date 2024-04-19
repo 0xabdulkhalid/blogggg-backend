@@ -1,4 +1,5 @@
 const passport = require("passport");
+const bcrypt = require("bcrypt");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("./models/user");
 
@@ -7,10 +8,11 @@ passport.use(
     try {
       const user = await User.findOne({ username: username });
       if (!user) {
-        return res.status(406).json({ message: "Incorrect Username" });
+        return done(null, false, { message: "Incorrect Username" });
       }
-      if (user.password !== password) {
-        return res.status(406).json({ message: "Incorrect password" });
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return done(null, false, { message: "Incorrect password" });
       }
       return done(null, user);
     } catch (err) {
