@@ -11,4 +11,6 @@ router.get("/list-posts", postController.list_posts);
 
 router.get("/view-post/:id", postController.view_post);
 
+router.get("/:postId/comments", commentsController.get_comments);
+
 module.exports = router;
