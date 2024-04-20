@@ -13,6 +13,7 @@ exports.create_post = asyncHandler(async (req, res, next) => {
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
+    cover: req.body.cover,
     isPublished: req.body.publish,
   });
 
@@ -22,7 +23,7 @@ exports.create_post = asyncHandler(async (req, res, next) => {
 
 exports.list_posts = asyncHandler(async (req, res, next) => {
   const posts = await Post.find({ isPublished: true }, { content: 0 })
-    .select("title createdAt")
+    .select("title cover createdAt")
     .exec();
   return res.status(200).json(posts);
 });
@@ -61,7 +62,9 @@ exports.modify_post = asyncHandler(async (req, res) => {
     await commentsController.delete_comments_for_post(req.params.postId);
     await Post.findByIdAndDelete(req.params.postId);
   } else {
+    post.title = req.body.title;
     post.content = req.body.content;
+    post.cover = req.body.cover;
     await post.save();
   }
 
