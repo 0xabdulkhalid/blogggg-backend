@@ -4,6 +4,7 @@ const passport = require("passport");
 const session = require("express-session");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const MongoStore = require("connect-mongo");
 require("dotenv").config();
 const userRouter = require("./routes/user");
 const postRouter = require("./routes/post");
@@ -25,6 +26,16 @@ app.use(
     secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      client: mongoose.connection,
+      stringify: false,
+      autoRemove: "interval",
+      autoRemoveInterval: 30,
+    }),
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+    },
   })
 );
 
