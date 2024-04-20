@@ -54,7 +54,7 @@ exports.modify_comment = asyncHandler(async (req, res) => {
       .json({ success: false, message: "Comment not found" });
   }
 
-  // Check if the current user is authorized to delete the comment
+  // Check if the current user is authorized to modify the comment
   if (comment.author !== req.user.username) {
     return res.status(403).json({
       success: false,
@@ -75,3 +75,7 @@ exports.modify_comment = asyncHandler(async (req, res) => {
     message: `Comment ${toDeleteComment ? "deleted" : "edited"} successfully`,
   });
 });
+
+exports.delete_comments_for_post = async (postId) => {
+  await Comment.deleteMany({ postId: postId });
+};

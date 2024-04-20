@@ -13,6 +13,10 @@ router.get("/view-post/:id", postController.view_post);
 
 router.get("/:postId/comments", commentsController.get_comments);
 
+router.delete("/delete-post/:postId", postController.modify_post);
+
+router.patch("/update-post/:postId", postController.modify_post);
+
 router.delete("/delete-comment/:commentId", commentsController.modify_comment);
 
 router.patch("/update-comment/:commentId", commentsController.modify_comment);
