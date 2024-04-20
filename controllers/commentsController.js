@@ -42,7 +42,9 @@ exports.get_comments = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: comments });
 });
 
-exports.delete_comment = asyncHandler(async (req, res) => {
+exports.modify_comment = asyncHandler(async (req, res) => {
+  const toDeleteComment = req.query.delete === "true";
+
   const comment = await Comment.findById(req.params.commentId);
 
   // Check if comment really exists before proceeding.
@@ -56,14 +58,20 @@ exports.delete_comment = asyncHandler(async (req, res) => {
   if (comment.author !== req.user.username) {
     return res.status(403).json({
       success: false,
-      message: "You are not authorized to delete this comment",
+      message: "You are not authorized to modify this comment",
     });
   }
 
-  // Delete the comment
-  await Comment.findByIdAndDelete(req.params.commentId);
+  // Delete the comment, Otherwise update the comment
+  if (toDeleteComment) {
+    await Comment.findByIdAndDelete(req.params.commentId);
+  } else {
+    comment.content = req.body.content;
+    await comment.save();
+  }
 
-  res
-    .status(200)
-    .json({ success: true, message: "Comment deleted successfully" });
+  res.status(200).json({
+    success: true,
+    message: `Comment ${toDeleteComment ? "deleted" : "edited"} successfully`,
+  });
 });

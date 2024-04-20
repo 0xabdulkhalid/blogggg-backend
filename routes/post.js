@@ -13,6 +13,8 @@ router.get("/view-post/:id", postController.view_post);
 
 router.get("/:postId/comments", commentsController.get_comments);
 
-router.delete("/delete-comment/:commentId", commentsController.delete_comment);
+router.delete("/delete-comment/:commentId", commentsController.modify_comment);
+
+router.patch("/update-comment/:commentId", commentsController.modify_comment);
 
 module.exports = router;
