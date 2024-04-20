@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Comment = require("../models/comment");
+const Post = require("../models/post");
 
 exports.create_comment = asyncHandler(async (req, res) => {
   // Check if the user is Logged in
@@ -7,6 +8,18 @@ exports.create_comment = asyncHandler(async (req, res) => {
     return res
       .status(403)
       .json({ message: "Unauthorized: Login to create comments" });
+
+  const post = await Post.findById(req.params.postId);
+
+  // Check if post really exists before proceeding.
+  if (!post) {
+    return res
+      .status(404)
+      .json({
+        success: false,
+        message: "Post not found, Comment can't be created",
+      });
+  }
 
   const comment = new Comment({
     author: req.user.username,
