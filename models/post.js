@@ -7,6 +7,7 @@ const PostSchema = new Schema({
   cover: { type: String, require: true },
   createdAt: { type: Date, default: Date.now() },
   isPublished: { type: Boolean, require: true },
+  tag: { type: String },
 });
 
 module.exports = mongoose.model("Post", PostSchema);

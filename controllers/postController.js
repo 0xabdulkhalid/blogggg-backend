@@ -15,6 +15,7 @@ exports.create_post = asyncHandler(async (req, res, next) => {
     content: req.body.content,
     cover: req.body.cover,
     isPublished: req.body.publish,
+    tag: req.body.tag,
   });
 
   const result = await post.save();
@@ -22,9 +23,15 @@ exports.create_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.list_posts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find({ isPublished: true }, { content: 0 })
+  const tag = req.query.tag || "all";
+
+  const query =
+    tag === "all" ? { isPublished: true } : { isPublished: true, tag: tag };
+
+  const posts = await Post.find(query, { content: 0 })
     .select("title cover createdAt")
     .exec();
+
   return res.status(200).json(posts);
 });
 
@@ -65,6 +72,7 @@ exports.modify_post = asyncHandler(async (req, res) => {
     post.title = req.body.title;
     post.content = req.body.content;
     post.cover = req.body.cover;
+    post.tag = req.body.tag;
     await post.save();
   }
 
