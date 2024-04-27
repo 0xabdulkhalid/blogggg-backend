@@ -73,3 +73,9 @@ exports.logout_user = async (req, res, next) => {
     return res.status(200).send("success");
   });
 };
+
+exports.authenticate_user = (req, res, next) => {
+  if (req.isAuthenticated()) return res.json(req.user);
+
+  return res.status(401).send("401 Unauthorized");
+};
