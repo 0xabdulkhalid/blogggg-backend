@@ -32,11 +32,12 @@ exports.create_user = [
     } else {
       const result = await user.save();
 
+      user.password = "";
       req.login(user, function (err) {
         if (err) {
           return next(err);
         }
-        user.password = "";
+
         return res.status(200).json(user);
       });
     }
@@ -55,11 +56,12 @@ exports.login_user = (req, res, next) => {
       });
     }
 
+    user.password = "";
     req.login(user, function (err) {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
-      user.password = "";
+
       return res.status(200).json(user);
     });
   })(req, res, next);
