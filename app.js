@@ -46,6 +46,9 @@ app.use(
     }),
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+      secure: process.env.NODE_ENV === "production", // Force the cookie to only be sent over HTTPS
+      httpOnly: true, // Prevent client-side scripts from accessing the cookie
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // Prevents CSRF
     },
   })
 );
