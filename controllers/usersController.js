@@ -3,6 +3,8 @@ const User = require("../models/user");
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 exports.create_user = [
   body("username", "User Name is required.")
@@ -72,7 +74,31 @@ exports.logout_user = async (req, res, next) => {
     if (err) {
       return next(err);
     }
-    return res.status(200).send("success");
+
+    // Clear the cookie
+    res.clearCookie("connect.sid", {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
+
+    // Delete the session document
+    const sessionId = req.session.id;
+    if (sessionId) {
+      mongoose.connection.db
+        .collection("sessions")
+        .findOneAndDelete({ _id: sessionId })
+        .then(() => {
+          return res.status(200).send("success");
+        })
+        .catch((err) => {
+          console.error(`Error removing session ${sessionId}: ${err}`);
+          return res.status(500).send(`Error removing session: ${err}`);
+        });
+    } else {
+      return res.status(200).send("success");
+    }
   });
 };
 
