@@ -5,10 +5,21 @@ const session = require("express-session");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
+const cors = require("cors");
 require("dotenv").config();
 const userRouter = require("./routes/user");
 const postRouter = require("./routes/post");
 const app = express();
+
+// Enable CORS with specific options
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: "GET,POST,PATCH,DELETE", // Allow all HTTP methods
+    allowedHeaders: "Content-Type,Authorization,Cookie", // Allow only specified headers
+    credentials: true, // Allow sending cookies with cross-origin requests
+  })
+);
 
 const mongoDB = process.env.MONGO_URI;
 mongoose.set("strictQuery", false);
@@ -49,12 +60,6 @@ app.use((req, res, next) => {
 // Routes
 app.use("/user", userRouter);
 app.use("/blog", postRouter);
-
-app.get("/test", (req, res, next) => {
-  if (!req.isAuthenticated()) return res.status(403).send("Unauthenticated");
-
-  return res.status(200).send("You're Authenticated");
-});
 
 require("./passport-config");
 
