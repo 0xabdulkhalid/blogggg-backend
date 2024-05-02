@@ -23,16 +23,27 @@ exports.create_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.list_posts = asyncHandler(async (req, res, next) => {
-  const tag = req.query.tag || "all";
+  const tag = req.query.tag || "All";
+  const limit = parseInt(req.query.limit) || 6; // Default limit is 6
+  const offset = parseInt(req.query.offset) || 0; // Default offset is 0
 
   const query =
-    tag === "all" ? { isPublished: true } : { isPublished: true, tag: tag };
+    tag === "All" ? { isPublished: true } : { isPublished: true, tag: tag };
+
+  const totalCount = await Post.countDocuments(query);
 
   const posts = await Post.find(query, { content: 0 })
     .select("title cover createdAt")
+    .skip(offset)
+    .limit(limit)
     .exec();
 
-  return res.status(200).json(posts);
+  return res.status(200).json({
+    posts,
+    totalCount,
+    limit,
+    offset,
+  });
 });
 
 exports.view_post = asyncHandler(async (req, res, next) => {
