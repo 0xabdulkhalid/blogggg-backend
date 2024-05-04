@@ -30,6 +30,11 @@ exports.list_posts = asyncHandler(async (req, res, next) => {
   const query =
     tag === "All" ? { isPublished: true } : { isPublished: true, tag: tag };
 
+  // Admin can only view both Published and Un-published Posts
+  if (!(!req.user || (!req.user && !req.user.isAdmin))) {
+    query.isPublished = req.query.isNotPublished ? false : true;
+  }
+
   const totalCount = await Post.countDocuments(query);
 
   const posts = await Post.find(query, { content: 0 })
