@@ -14,6 +14,7 @@ exports.create_post = asyncHandler(async (req, res, next) => {
     title: req.body.title,
     content: req.body.content,
     cover: req.body.cover,
+    description: req.body.description,
     isPublished: req.body.publish,
     tag: req.body.tag,
   });
@@ -38,7 +39,7 @@ exports.list_posts = asyncHandler(async (req, res, next) => {
   const totalCount = await Post.countDocuments(query);
 
   const posts = await Post.find(query, { content: 0 })
-    .select("title cover createdAt")
+    .select("title cover createdAt description")
     .skip(offset)
     .limit(limit)
     .exec();
@@ -88,6 +89,7 @@ exports.modify_post = asyncHandler(async (req, res) => {
     post.title = req.body.title;
     post.content = req.body.content;
     post.cover = req.body.cover;
+    post.description = req.body.description;
     post.tag = req.body.tag;
     await post.save();
   }
