@@ -16,9 +16,9 @@ exports.create_user = [
         throw new Error("Username is already in use.");
       }
     }),
-  body("password", "Password should be at least 3 characters.")
+  body("password", "Password should be at least 8 characters.")
     .trim()
-    .isLength({ min: 3 }),
+    .isLength({ min: 8 }),
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
@@ -29,8 +29,13 @@ exports.create_user = [
     });
 
     if (!errors.isEmpty()) {
-      user.password = req.body.password;
-      res.status(406).json({ errors: errors.mapped() });
+      const errorMessages = {};
+      const err = errors.mapped();
+      Object.keys(err).forEach((key) => {
+        errorMessages[key] = err[key].msg;
+      });
+
+      res.status(406).json({ errors: errorMessages });
     } else {
       const result = await user.save();
 
@@ -75,14 +80,6 @@ exports.logout_user = async (req, res, next) => {
       return next(err);
     }
 
-    // Clear the cookie
-    res.clearCookie("connect.sid", {
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-    });
-
     // Delete the session document
     const sessionId = req.session.id;
     if (sessionId) {
@@ -90,6 +87,8 @@ exports.logout_user = async (req, res, next) => {
         .collection("sessions")
         .findOneAndDelete({ _id: sessionId })
         .then(() => {
+          // Clear the cookie
+          res.clearCookie("connect.sid");
           return res.status(200).send("success");
         })
         .catch((err) => {
