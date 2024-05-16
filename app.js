@@ -14,7 +14,7 @@ const app = express();
 // Enable CORS with specific options
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "*",
     methods: "GET,POST,PATCH,DELETE", // Allow all HTTP methods
     allowedHeaders: "Content-Type,Authorization,Cookie", // Allow only specified headers
     credentials: true, // Allow sending cookies with cross-origin requests

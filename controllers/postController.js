@@ -15,7 +15,7 @@ exports.create_post = asyncHandler(async (req, res, next) => {
     content: req.body.content,
     cover: req.body.cover,
     description: req.body.description,
-    isPublished: req.body.publish,
+    isPublished: req.body.isPublished,
     tag: req.body.tag,
   });
 
